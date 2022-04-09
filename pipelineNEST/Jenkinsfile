@@ -1,0 +1,53 @@
+pipeline {
+
+    agent any
+    environment {
+        PASS = credentials('DOCKER_PASS') 
+        UBUNTU_PASS = credentials('UBUNTUNO_PASS') 
+    }
+
+    stages {
+	stage('Install-Dependencies') {
+            steps {
+                sh './jenkins/install/install.sh'
+            }
+        }
+	
+	stage('Build-Dist') {
+            steps {
+                sh './jenkins/build/buildDist.sh'
+            }
+	    post {
+                success {
+                   archiveArtifacts artifacts: 'nest-app/dist/*', onlyIfSuccessful: true
+                }
+            }
+        }
+
+        stage('Build-Docker-Image') {
+            steps {
+                sh './jenkins/build/buildDockerImage.sh'
+            }
+        }
+	
+	stage('Test') {
+            steps {
+                sh './jenkins/test/test.sh'
+            }
+        }
+	
+	stage('Push') {
+            steps {
+                sh './jenkins/push/push.sh'
+            }
+        }        
+
+	stage('Deploy') {
+            steps {
+                sh './jenkins/deploy/deploy.sh'
+            }
+        }
+        
+    }
+
+}

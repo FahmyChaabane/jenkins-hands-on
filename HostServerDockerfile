@@ -1,0 +1,22 @@
+FROM ubuntu:20.04
+
+USER root
+RUN apt-get update
+RUN apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# it isn't 100% similar to the jenkins installation (khater jenkins image based on a specific debian distribution), it has something to do with the distribution version of debian, i just ended up replacing 'debian' by 'ubuntu' : https://stackoverflow.com/questions/41133455/docker-repository-does-not-have-a-release-file-on-running-apt-get-update-on-ubun
+# someone commented in some docker forum : It is fixed now. Make sure you use ubuntu repos and not debian.
+RUN echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+  
+# https://askubuntu.com/questions/909277/avoiding-user-interaction-with-tzdata-when-installing-certbot-in-a-docker-contai
+ARG DEBIAN_FRONTEND=noninteractive 
+RUN apt-get update
+RUN apt-get install -y docker-ce docker-ce-cli containerd.io
+
+RUN apt-get install -y openssh-server
