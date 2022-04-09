@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+echo "*******************************"
+echo "****** push to dockerhub ******"
+echo "*******************************"
+
+#!/bin/bash
+
+
+echo "****************************"
+echo "****** start the test ******"
+echo "****************************"
+
+docker container run --rm -v $(pwd)/java-app:/usr/app -v mvnDEP:/root/.m2/ -w /usr/app maven:alpine mvn test
+
+
+docker container run --rm -v $(pwd)/java-app:/usr/app -v mvnDEP:/root/.m2/ -w /usr/app maven:alpine mvn test
